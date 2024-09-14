@@ -1,5 +1,6 @@
 package com.service.provider.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,12 +9,10 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Documents{
-
-     @Id
+public class Language {
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long documentId;
-    private String documentFilePath;
-    private long providerid;
-
+    private long id;
+    @Column(unique = true)
+    private String language;
 }

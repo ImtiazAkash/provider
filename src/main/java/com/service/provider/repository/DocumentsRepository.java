@@ -4,14 +4,14 @@
  */
 package com.service.provider.repository;
 
-import com.service.provider.model.Documents;
+import com.service.provider.model.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  *
  * @author User
  */
-public interface DocumentsRepository extends JpaRepository<Documents, Long>{
+public interface DocumentsRepository extends JpaRepository<Document, Long>{
     
-    Documents findByproviderid(long providerid);
+    
 }

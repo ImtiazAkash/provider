@@ -6,33 +6,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
-import java.util.Date;
 import lombok.Data;
-
 
 @Data
 @Entity
-public class Review {
-
+public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long reviewId;
+    private long id;
 
-    private String review;
-    private Date reviewDate;
-    private String reviewCountry;
-    private int rating;
-    private String reviewImagePath;
+    private String name;
+    private String position;
+    private String imagePath; // Assuming this will store the path or URL to the image
 
     @ManyToOne
     @JoinColumn(name = "providerId")
     private Provider provider;
-
-
-   
-
-   
-
-
 }

@@ -12,18 +12,23 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.service.provider.dto.ReviewDto;
 import com.service.provider.model.Provider;
 import com.service.provider.model.Review;
+import com.service.provider.model.ReviewList;
 import com.service.provider.service.ProviderService;
 
 /**
@@ -79,8 +84,9 @@ public class ProviderController {
     @PostMapping("/{providerId}/replace-reviews")
     public ResponseEntity<String> replaceProviderReviews(
             @PathVariable Long providerId,
-            @RequestBody Set<Review> newReviews) {
-        String provider = providerService.replaceProviderReviews(providerId, newReviews);
+            @ModelAttribute ReviewList list) {
+                System.out.println(list);
+        String provider = providerService.replaceProviderReviews(providerId, list.getReviews());
         return ResponseEntity.ok(provider);
 
     }

@@ -4,6 +4,7 @@ package com.service.provider.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.service.provider.dto.ReviewDto;
 import com.service.provider.model.Provider;
 import com.service.provider.model.Review;
 
@@ -24,5 +25,5 @@ public interface ProviderService {
 
     public String addLanguagesToProvider(long providerId, Set<String>languageNames);
 
-    public String replaceProviderReviews(Long providerId, Set<Review> newReviews);
+    public String replaceProviderReviews(Long providerId, List<ReviewDto> newReviews);
 }

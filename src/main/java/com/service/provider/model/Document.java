@@ -2,6 +2,9 @@ package com.service.provider.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +25,7 @@ public class Document{
 
     @ManyToOne
     @JoinColumn(name = "providerId")
+    @JsonBackReference
     private Provider provider;
 
 }

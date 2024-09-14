@@ -16,6 +16,9 @@ import lombok.Data;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 
 
@@ -37,15 +40,19 @@ public class Provider {
     private String imageFilePath;
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Review> reviews;
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Document> documents;
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Staff> staff;
 
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Award> awards;
 
     @ManyToMany
@@ -54,6 +61,7 @@ public class Provider {
         joinColumns = @JoinColumn(name = "providerId"), // Foreign key for Profile
         inverseJoinColumns = @JoinColumn(name = "languageId") // Foreign key for Language
     )
+    @JsonManagedReference
     private Set<Language> languages;
     
     

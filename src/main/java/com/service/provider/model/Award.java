@@ -2,6 +2,9 @@ package com.service.provider.model;
 
 import org.springframework.context.annotation.Profile;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,5 +26,6 @@ public class Award {
 
     @ManyToOne
     @JoinColumn(name = "providerId")
+    @JsonBackReference
     private Provider provider; 
 }

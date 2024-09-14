@@ -8,6 +8,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 
@@ -27,6 +31,7 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "providerId")
+    @JsonBackReference
     private Provider provider;
 
 

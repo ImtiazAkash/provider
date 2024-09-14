@@ -1,16 +1,21 @@
 package com.service.provider.service;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.service.provider.model.Document;
+import com.service.provider.model.Language;
 import com.service.provider.model.Provider;
 import com.service.provider.model.Review;
 import com.service.provider.repository.DocumentsRepository;
+import com.service.provider.repository.LanguageRepository;
 import com.service.provider.repository.ProviderRepository;
 import com.service.provider.repository.ReviewRepository;
 import java.io.File;
@@ -28,6 +33,8 @@ public class ProviderServiceImpl implements ProviderService {
     private ReviewRepository reviewRepository;
     @Autowired
     private DocumentsRepository documentRepository;
+    @Autowired
+    private LanguageRepository languageRepository;
 
     private static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
 
@@ -108,5 +115,75 @@ public class ProviderServiceImpl implements ProviderService {
 
         documentRepository.save(document);
     }
+
+    @Override
+    public Optional<Provider> getProviderById(long providerId) {
+        return this.providerRepository.findById(providerId);
+
+        
+    }
+
+    @Override
+    public List<Provider> getAllProvider() {
+       return this.providerRepository.findAll();
+    }
+
+    @Override
+    public String addLanguagesToProvider(long providerId, Set<String> languageNames) {
+       try {
+        Provider provider = providerRepository.findById(providerId)
+            .orElseThrow(() -> new Exception("Provider not found with id " + providerId));
+
+        // Fetch or create languages
+        Set<Language> languages = new HashSet<>();
+        for (String languageName : languageNames) {
+            Language language = languageRepository.findByLanguage(languageName);
+            if (language == null) {
+                language = new Language();
+                language.setLanguage(languageName);
+                language = languageRepository.save(language);
+            }
+            languages.add(language);
+        }
+
+        // Add languages to provider
+        provider.getLanguages().addAll(languages);
+
+        // Save the updated provider
+        providerRepository.save(provider);
+        return "Language added successfully";
+       } catch (Exception e) {
+        // TODO: handle exception
+        return "Failed to add language!";
+       }
+    }
+
+    @Override
+    public String replaceProviderReviews(Long providerId, Set<Review> newReviews) {
+        try {
+            Provider provider = providerRepository.findById(providerId)
+            .orElseThrow(() -> new Exception("Provider not found with id " + providerId));
+
+        // Delete all existing reviews
+        provider.getReviews().clear();
+        reviewRepository.deleteAll(provider.getReviews());
+
+        // Add new reviews
+        for (Review newReview : newReviews) {
+            newReview.setProvider(provider);
+            provider.getReviews().add(newReview);
+        }
+
+        // Save the updated provider
+        providerRepository.save(provider);
+        return "Reviews updated successfully";
+        } catch (Exception e) {
+            // TODO: handle exception
+            return "Updating reviews failed";
+        }
+    }
+
+
+    
 
 }

@@ -33,6 +33,8 @@ public class Review {
     @JoinColumn(name = "providerId")
     @JsonBackReference
     private Provider provider;
+    @ManyToOne
+    private User user;
 
 
    

@@ -10,12 +10,16 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.service.provider.dto.AwardDto;
+import com.service.provider.dto.DocumentDto;
+import com.service.provider.dto.ProviderDto;
 import com.service.provider.dto.ReviewDto;
+import com.service.provider.model.Award;
 import com.service.provider.model.Document;
 import com.service.provider.model.Language;
 import com.service.provider.model.Provider;
 import com.service.provider.model.Review;
+import com.service.provider.repository.AwardRepository;
 import com.service.provider.repository.DocumentsRepository;
 import com.service.provider.repository.LanguageRepository;
 import com.service.provider.repository.ProviderRepository;
@@ -40,6 +44,8 @@ public class ProviderServiceImpl implements ProviderService {
     private DocumentsRepository documentRepository;
     @Autowired
     private LanguageRepository languageRepository;
+    @Autowired
+    private AwardRepository awardRepository;
 
     private static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
 
@@ -60,7 +66,6 @@ public class ProviderServiceImpl implements ProviderService {
             try {
                 Files.write(imagePath, imageFile.getBytes());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             providerImagePath = imagePath.toString();
@@ -86,7 +91,6 @@ public class ProviderServiceImpl implements ProviderService {
             try {
                 Files.write(reviewImagePath, reviewImage.getBytes());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             reviewImagePathString = reviewImagePath.toString();
@@ -109,7 +113,6 @@ public class ProviderServiceImpl implements ProviderService {
             try {
                 Files.write(documentFilePath, documentFile.getBytes());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             documentFilePathString = documentFilePath.toString();
@@ -157,7 +160,6 @@ public class ProviderServiceImpl implements ProviderService {
             providerRepository.save(provider);
             return "Language added successfully";
         } catch (Exception e) {
-            // TODO: handle exception
             return "Failed to add language!";
         }
     }
@@ -193,13 +195,13 @@ public class ProviderServiceImpl implements ProviderService {
 
                 String reviewImagePathString = "";
                 if (newReview.getReviewImage() != null && !newReview.getReviewImage().isEmpty()) {
-                    String profileImageFileName = System.currentTimeMillis() + "_"
+                    String reviewImageFileName = System.currentTimeMillis() + "_"
                             + newReview.getReviewImage().getOriginalFilename();
-                    Path reviewImagePath = Paths.get(UPLOAD_DIRECTORY, profileImageFileName);
+                    Path reviewImagePath = Paths.get(UPLOAD_DIRECTORY, reviewImageFileName);
                     try {
                         Files.write(reviewImagePath, newReview.getReviewImage().getBytes());
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
+
                         e.printStackTrace();
                     }
                     reviewImagePathString = reviewImagePath.toString();
@@ -212,10 +214,140 @@ public class ProviderServiceImpl implements ProviderService {
             providerRepository.save(provider);
             return "Reviews updated successfully";
         } catch (Exception e) {
-            // TODO: handle exception
+
             e.printStackTrace();
             return "Updating reviews failed";
         }
     }
+
+    @Override
+    public String replaceAwardsAndRecognition(long providerId, List<AwardDto> newAwards) {
+        try {
+
+            Provider provider = providerRepository.findById(providerId)
+                    .orElseThrow(() -> new Exception("Provider not found with id " + providerId));
+
+            // Delete all existing reviews
+            Set<Long> awardIdsToDelete = provider.getAwards().stream().map(Award::getAwardId)
+                    .collect(Collectors.toSet());
+
+            if (!awardIdsToDelete.isEmpty()) {
+                awardRepository.deleteAllById(awardIdsToDelete);
+            }
+
+            // Clear the existing reviews in memory
+            provider.getAwards().clear();
+
+            // Add new reviews
+            for (AwardDto newAward : newAwards) {
+                Award award = new Award();
+                award.setAwardTitle(newAward.getAwardTitle());
+                award.setAwardDescription(newAward.getAwardDescription());
+                award.setAwardYear(newAward.getAwardYear());
+                
+                award.setProvider(provider);
+
+                
+                
+                provider.getAwards().add(award);
+            }
+
+            // Save the updated provider
+            providerRepository.save(provider);
+            return "Awards updated successfully";
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return "Updating awards failed";
+        }
+    }
+
+    @Override
+    public String replaceDocuments(long providerId, List<DocumentDto> newDocuments) {
+        try {
+
+            Provider provider = providerRepository.findById(providerId)
+                    .orElseThrow(() -> new Exception("Provider not found with id " + providerId));
+
+            // Delete all existing reviews
+            Set<Long> documentIdsToDelete = provider.getDocuments().stream().map(Document::getDocumentId)
+                    .collect(Collectors.toSet());
+
+            if (!documentIdsToDelete.isEmpty()) {
+                documentRepository.deleteAllById(documentIdsToDelete);
+            }
+
+            // Clear the existing reviews in memory
+            provider.getDocuments().clear();
+
+            // Add new reviews
+            for (DocumentDto newDocument : newDocuments) {
+                Document document = new Document();
+                document.setProvider(provider);
+
+                String documentFilePathString = "";
+                if (newDocument.getDocumentFile() != null && !newDocument.getDocumentFile().isEmpty()) {
+                    String documentFileName = System.currentTimeMillis() + "_"
+                            + newDocument.getDocumentFile().getOriginalFilename();
+                    Path documentFilePath = Paths.get(UPLOAD_DIRECTORY, documentFileName);
+                    try {
+                        Files.write(documentFilePath, newDocument.getDocumentFile().getBytes());
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                    }
+                    documentFilePathString = documentFilePath.toString();
+                }
+
+                document.setDocumentFilePath(documentFilePathString);
+
+                provider.getDocuments().add(document);
+            }
+
+            // Save the updated provider
+            providerRepository.save(provider);
+            return "Document updated successfully";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Updating document failed";
+        }
+    }
+
+    @Override
+    public String updateProviderProfile(long providerId, ProviderDto profile) {
+        try {
+            Provider provider = providerRepository.findById(providerId)
+                    .orElseThrow(() -> new Exception("Provider not found with id " + providerId));
+
+            provider.setProviderName(profile.getProviderName());
+            provider.setBio(profile.getBio());
+            provider.setEmail(profile.getEmail());
+            provider.setPhone(profile.getPhone());
+            provider.setCity(profile.getCity());
+            provider.setCountry(profile.getCountry());
+
+            String providerImagePath = "";
+            if (profile.getImageFile() != null && !profile.getImageFile().isEmpty()) {
+                String profileImageFileName =
+                        System.currentTimeMillis() + "_" + profile.getImageFile().getOriginalFilename();
+                Path imagePath = Paths.get(UPLOAD_DIRECTORY, profileImageFileName);
+                try {
+                    Files.write(imagePath, profile.getImageFile().getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                providerImagePath = imagePath.toString();
+            }
+            provider.setImageFilePath(providerImagePath);
+
+            providerRepository.save(provider);
+            return "Profile updated successfully";
+        } catch (Exception e) {
+            return "Profile updating failed";
+        }
+    }
+
+
+    
 
 }

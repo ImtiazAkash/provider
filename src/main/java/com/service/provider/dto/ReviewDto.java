@@ -1,10 +1,8 @@
 package com.service.provider.dto;
 
 import java.util.Date;
-
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
-import com.service.provider.model.Provider;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,5 +19,5 @@ private long reviewId;
     private MultipartFile reviewImage;
 
     
-    private Provider provider;
+    private ProviderDto provider;
 }

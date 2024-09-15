@@ -2,16 +2,16 @@ package com.service.provider.service;
 
 
 
-import org.springframework.web.multipart.MultipartFile;
-
-import com.service.provider.dto.ReviewDto;
-import com.service.provider.model.Provider;
-import com.service.provider.model.Review;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.web.multipart.MultipartFile;
+import com.service.provider.dto.AwardDto;
+import com.service.provider.dto.DocumentDto;
+import com.service.provider.dto.ProviderDto;
+import com.service.provider.dto.ReviewDto;
+import com.service.provider.model.Provider;
 
 public interface ProviderService {
     public void addProviderWithReviewAndDocument(
@@ -26,4 +26,10 @@ public interface ProviderService {
     public String addLanguagesToProvider(long providerId, Set<String>languageNames);
 
     public String replaceProviderReviews(Long providerId, List<ReviewDto> newReviews);
+
+    public String replaceAwardsAndRecognition(long providerId, List<AwardDto> newAwards);
+
+    public String replaceDocuments(long providerId, List<DocumentDto> newDocuments);
+
+    public String updateProviderProfile(long providerId, ProviderDto profile);
 }

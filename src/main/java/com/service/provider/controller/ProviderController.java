@@ -8,26 +8,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.service.provider.dto.ReviewDto;
+import com.service.provider.dto.ProviderDto;
+import com.service.provider.model.AwardList;
+import com.service.provider.model.DocumentList;
 import com.service.provider.model.Provider;
-import com.service.provider.model.Review;
 import com.service.provider.model.ReviewList;
 import com.service.provider.service.ProviderService;
 
@@ -89,5 +88,28 @@ public class ProviderController {
         String provider = providerService.replaceProviderReviews(providerId, list.getReviews());
         return ResponseEntity.ok(provider);
 
+    }
+
+    @PostMapping("/{providerId}/replace-awards")
+    public ResponseEntity<String> replaceProviderAwards(@PathVariable Long providerId,
+            @ModelAttribute AwardList list) {
+        System.out.println(list);
+        String provider = providerService.replaceAwardsAndRecognition(providerId, list.getAwards());
+        return ResponseEntity.ok(provider);
+
+    }
+    @PostMapping("/{providerId}/replace-documents") 
+    public ResponseEntity<String> replaceProviderDocument(@PathVariable Long providerId,
+            @ModelAttribute DocumentList list) {
+        System.out.println(list);
+        String provider = providerService.replaceDocuments(providerId, list.getDocuments());
+        return ResponseEntity.ok(provider);
+
+    }
+
+    @PutMapping("/{providerId}/update-profile")
+    public ResponseEntity<String> updateProfile(@PathVariable long providerId, @ModelAttribute ProviderDto dto) {
+        String provider = providerService.updateProviderProfile(providerId, dto);
+        return ResponseEntity.ok(provider);
     }
 }

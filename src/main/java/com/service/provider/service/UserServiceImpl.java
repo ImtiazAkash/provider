@@ -85,7 +85,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             user.setRoles(roles);
 
             // Save the user to the database
-            userRepository.save(user);
+            User usersaved = userRepository.save(user);
+            System.out.println(usersaved);
             return "User created successfully";
         } catch (Exception e) {
             e.printStackTrace();

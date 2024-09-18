@@ -1,5 +1,6 @@
 package com.service.provider.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,16 +14,18 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-
-@Data
 @Entity
+@Getter
+@Setter
 public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long reviewId;
-
+    @Column(length = 1000)
     private String review;
     private Date reviewDate;
     private String reviewCountry;
@@ -35,11 +38,5 @@ public class Review {
     private Provider provider;
     @ManyToOne
     private User user;
-
-
-   
-
-   
-
 
 }

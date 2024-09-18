@@ -7,12 +7,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.service.provider.dto.AwardDto;
 import com.service.provider.dto.DocumentDto;
 import com.service.provider.dto.ProviderDto;
+import com.service.provider.dto.ProviderResponse;
 import com.service.provider.dto.ReviewDto;
 import com.service.provider.model.Award;
 import com.service.provider.model.Document;
@@ -46,6 +52,8 @@ public class ProviderServiceImpl implements ProviderService {
     private LanguageRepository languageRepository;
     @Autowired
     private AwardRepository awardRepository;
+
+    private ModelMapper modelMapper = ModelMapperST.getInstance();
 
     private static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
 
@@ -346,6 +354,37 @@ public class ProviderServiceImpl implements ProviderService {
             return "Profile updating failed";
         }
     }
+
+    @Override
+    public ProviderResponse getAllProvider(int pageNumber, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        System.out.println(pageNumber-1+" "+pageSize);
+        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, sort);
+
+        Page<Provider> pageProvider = this.providerRepository.findAll(pageable);
+        System.out.println(pageProvider.getContent());
+
+        List<Provider> providers = pageProvider.getContent();
+
+        
+
+        ProviderResponse providerResponse = new ProviderResponse();
+
+        providerResponse.setProviders(providers);
+        providerResponse.setPageNumber(pageProvider.getNumber());
+        providerResponse.setPageSize(pageProvider.getSize());
+        providerResponse.setTotalItems(pageProvider.getTotalElements());
+        providerResponse.setTotalPages(pageProvider.getTotalPages());
+        providerResponse.setLastPage(pageProvider.isLast());
+        System.out.println(pageProvider.getTotalPages());
+        return providerResponse;
+
+    }
+
+    public ProviderDto convertToDto(Provider provider) {
+
+		return modelMapper.map(provider, ProviderDto.class);
+	}
 
 
     

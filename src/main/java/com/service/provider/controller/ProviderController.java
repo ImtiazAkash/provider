@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.service.provider.dto.ProviderDto;
+import com.service.provider.dto.ProviderResponse;
 import com.service.provider.model.AwardList;
 import com.service.provider.model.DocumentList;
 import com.service.provider.model.Provider;
@@ -42,26 +43,27 @@ public class ProviderController {
     private ProviderService providerService;
 
     @PostMapping("/saveprovider")
-    public void createProvider(
+    public ResponseEntity<String> createProvider(
         @RequestParam String providerName, @RequestParam String bio, @RequestParam String email, 
         @RequestParam String phone, @RequestParam String city, @RequestParam String country, 
-        @RequestParam MultipartFile imageFile,
+        @RequestParam(required = false) MultipartFile imageFile,
         @RequestParam String reviewText, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date reviewDate, @RequestParam String reviewCountry,
-        @RequestParam int rating, @RequestParam MultipartFile reviewImage,
-        @RequestParam MultipartFile documentFile) {
-
+        @RequestParam int rating, @RequestParam(required = false) MultipartFile reviewImage,
+        @RequestParam(required = false) MultipartFile documentFile) {
+            System.out.println(reviewImage);
         providerService.addProviderWithReviewAndDocument(
             providerName, bio, email, phone, city, country, imageFile,
             reviewText, reviewDate, reviewCountry, rating, reviewImage,
             documentFile
         );
+        return ResponseEntity.ok("Saved");
     }
 
     @GetMapping("/getProviderById")
     public ResponseEntity<Provider> getProviderById(@RequestParam long providerId) {
         Optional<Provider> provider = this.providerService.getProviderById(providerId);
         if (provider.isPresent()) {
-            return new ResponseEntity<>(provider.get(), HttpStatus.FOUND);
+            return new ResponseEntity<>(provider.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -111,5 +113,16 @@ public class ProviderController {
     public ResponseEntity<String> updateProfile(@PathVariable long providerId, @ModelAttribute ProviderDto dto) {
         String provider = providerService.updateProviderProfile(providerId, dto);
         return ResponseEntity.ok(provider);
+    }
+
+    @GetMapping("/get-all-providers")
+    public ResponseEntity<ProviderResponse> getAllProviders(
+        @RequestParam (defaultValue = "0", required = false) int pageNumber,
+        @RequestParam (defaultValue = "10", required = false) int pageSize,
+        @RequestParam (defaultValue = "providerName", required = false) String sortBy,
+        @RequestParam (defaultValue = "asc", required = false) String sortDir
+    ) {
+        ProviderResponse allProvider = this.providerService.getAllProvider(pageNumber, pageSize, sortBy, sortDir);
+        return new ResponseEntity<>(allProvider, HttpStatus.OK);
     }
 }

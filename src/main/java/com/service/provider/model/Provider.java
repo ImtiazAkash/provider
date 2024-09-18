@@ -3,6 +3,7 @@ package com.service.provider.model;
 
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +14,10 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +28,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 
 public class Provider {
 
@@ -32,6 +39,8 @@ public class Provider {
     private long providerId;
 
     private String providerName;
+    
+    @Column(length=1000)
     private String bio;
     private String email;
     private String phone;

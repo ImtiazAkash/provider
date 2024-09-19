@@ -5,10 +5,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,30 +55,33 @@ public class ProviderServiceImpl implements ProviderService {
     @Autowired
     private AwardRepository awardRepository;
 
+
+
     private ModelMapper modelMapper = ModelMapperST.getInstance();
 
-    private static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
+    @Value("${project.image}")
+    private String imageDir;
 
     @Override
     public void addProviderWithReviewAndDocument(String providerName, String bio, String email, String phone,
             String city, String country, MultipartFile imageFile, String reviewText, Date reviewDate,
             String reviewCountry, int rating, MultipartFile reviewImage, MultipartFile documentFile) {
 
-        File uploadDir = new File(UPLOAD_DIRECTORY);
+        File uploadDir = new File(imageDir);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
 
         String providerImagePath = "";
         if (imageFile != null && !imageFile.isEmpty()) {
-            String profileImageFileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
-            Path imagePath = Paths.get(UPLOAD_DIRECTORY, profileImageFileName);
+            String fileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+            File destinationFile = new File(imageDir + fileName);
             try {
-                Files.write(imagePath, imageFile.getBytes());
+                imageFile.transferTo(destinationFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            providerImagePath = imagePath.toString();
+            providerImagePath = fileName;
         }
 
         Provider provider = new Provider();
@@ -94,14 +99,14 @@ public class ProviderServiceImpl implements ProviderService {
         // Create and save the review
         String reviewImagePathString = "";
         if (reviewImage != null && !reviewImage.isEmpty()) {
-            String profileImageFileName = System.currentTimeMillis() + "_" + reviewImage.getOriginalFilename();
-            Path reviewImagePath = Paths.get(UPLOAD_DIRECTORY, profileImageFileName);
+            String fileName = UUID.randomUUID().toString() + "_" + reviewImage.getOriginalFilename();
+            File destinationFile = new File(imageDir + fileName);
             try {
-                Files.write(reviewImagePath, reviewImage.getBytes());
+                reviewImage.transferTo(destinationFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            reviewImagePathString = reviewImagePath.toString();
+            reviewImagePathString = fileName;
         }
 
         Review review = new Review();
@@ -116,14 +121,14 @@ public class ProviderServiceImpl implements ProviderService {
         // Create and save the document
         String documentFilePathString = "";
         if (documentFile != null && !documentFile.isEmpty()) {
-            String profileImageFileName = System.currentTimeMillis() + "_" + documentFile.getOriginalFilename();
-            Path documentFilePath = Paths.get(UPLOAD_DIRECTORY, profileImageFileName);
+            String fileName = UUID.randomUUID().toString() + "_" + documentFile.getOriginalFilename();
+            File destinationFile = new File(imageDir + fileName);
             try {
-                Files.write(documentFilePath, documentFile.getBytes());
+                documentFile.transferTo(destinationFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            documentFilePathString = documentFilePath.toString();
+            documentFilePathString = fileName;
         }
         Document document = new Document();
         document.setDocumentFilePath(documentFilePathString);
@@ -176,7 +181,7 @@ public class ProviderServiceImpl implements ProviderService {
     @Transactional
     public String replaceProviderReviews(Long providerId, List<ReviewDto> newReviews) {
         try {
-            
+
             Provider provider = providerRepository.findById(providerId)
                     .orElseThrow(() -> new Exception("Provider not found with id " + providerId));
 
@@ -201,18 +206,22 @@ public class ProviderServiceImpl implements ProviderService {
                 review.setRating(newReview.getRating());
                 review.setProvider(provider);
 
+                File uploadDir = new File(imageDir);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
                 String reviewImagePathString = "";
                 if (newReview.getReviewImage() != null && !newReview.getReviewImage().isEmpty()) {
-                    String reviewImageFileName = System.currentTimeMillis() + "_"
+                    String fileName = UUID.randomUUID().toString() + "_"
                             + newReview.getReviewImage().getOriginalFilename();
-                    Path reviewImagePath = Paths.get(UPLOAD_DIRECTORY, reviewImageFileName);
+                    File destinationFile = new File(imageDir + fileName);
                     try {
-                        Files.write(reviewImagePath, newReview.getReviewImage().getBytes());
+                        newReview.getReviewImage().transferTo(destinationFile);
                     } catch (IOException e) {
-
                         e.printStackTrace();
                     }
-                    reviewImagePathString = reviewImagePath.toString();
+                    reviewImagePathString = fileName;
                 }
                 review.setReviewImagePath(reviewImagePathString);
                 provider.getReviews().add(review);
@@ -252,11 +261,9 @@ public class ProviderServiceImpl implements ProviderService {
                 award.setAwardTitle(newAward.getAwardTitle());
                 award.setAwardDescription(newAward.getAwardDescription());
                 award.setAwardYear(newAward.getAwardYear());
-                
+
                 award.setProvider(provider);
 
-                
-                
                 provider.getAwards().add(award);
             }
 
@@ -293,18 +300,22 @@ public class ProviderServiceImpl implements ProviderService {
                 Document document = new Document();
                 document.setProvider(provider);
 
+                File uploadDir = new File(imageDir);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
                 String documentFilePathString = "";
                 if (newDocument.getDocumentFile() != null && !newDocument.getDocumentFile().isEmpty()) {
-                    String documentFileName = System.currentTimeMillis() + "_"
+                    String fileName = UUID.randomUUID().toString() + "_"
                             + newDocument.getDocumentFile().getOriginalFilename();
-                    Path documentFilePath = Paths.get(UPLOAD_DIRECTORY, documentFileName);
+                    File destinationFile = new File(imageDir + fileName);
                     try {
-                        Files.write(documentFilePath, newDocument.getDocumentFile().getBytes());
+                        newDocument.getDocumentFile().transferTo(destinationFile);
                     } catch (IOException e) {
-
                         e.printStackTrace();
                     }
-                    documentFilePathString = documentFilePath.toString();
+                    documentFilePathString = fileName;
                 }
 
                 document.setDocumentFilePath(documentFilePathString);
@@ -322,6 +333,7 @@ public class ProviderServiceImpl implements ProviderService {
     }
 
     @Override
+    @Transactional
     public String updateProviderProfile(long providerId, ProviderDto profile) {
         try {
             Provider provider = providerRepository.findById(providerId)
@@ -334,39 +346,44 @@ public class ProviderServiceImpl implements ProviderService {
             provider.setCity(profile.getCity());
             provider.setCountry(profile.getCountry());
 
+            File uploadDir = new File(imageDir);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
             String providerImagePath = "";
             if (profile.getImageFile() != null && !profile.getImageFile().isEmpty()) {
-                String profileImageFileName =
-                        System.currentTimeMillis() + "_" + profile.getImageFile().getOriginalFilename();
-                Path imagePath = Paths.get(UPLOAD_DIRECTORY, profileImageFileName);
+                String fileName = UUID.randomUUID().toString() + "_" + profile.getImageFile().getOriginalFilename();
+                String destinationFile = imageDir + File.separator + fileName;
+                System.out.println("++++++++++++++++++++++++++++++++++"+destinationFile);
                 try {
-                    Files.write(imagePath, profile.getImageFile().getBytes());
+                    Files.copy(profile.getImageFile().getInputStream(), Paths.get(destinationFile));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                providerImagePath = imagePath.toString();
+                providerImagePath = fileName;
             }
             provider.setImageFilePath(providerImagePath);
 
             providerRepository.save(provider);
             return "Profile updated successfully";
         } catch (Exception e) {
+            e.printStackTrace();
             return "Profile updating failed";
+
         }
     }
 
     @Override
     public ProviderResponse getAllProvider(int pageNumber, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        System.out.println(pageNumber-1+" "+pageSize);
-        Pageable pageable = PageRequest.of(pageNumber-1, pageSize, sort);
+        System.out.println(pageNumber - 1 + " " + pageSize);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
 
         Page<Provider> pageProvider = this.providerRepository.findAll(pageable);
         System.out.println(pageProvider.getContent());
 
         List<Provider> providers = pageProvider.getContent();
-
-        
 
         ProviderResponse providerResponse = new ProviderResponse();
 
@@ -383,10 +400,7 @@ public class ProviderServiceImpl implements ProviderService {
 
     public ProviderDto convertToDto(Provider provider) {
 
-		return modelMapper.map(provider, ProviderDto.class);
-	}
-
-
-    
+        return modelMapper.map(provider, ProviderDto.class);
+    }
 
 }

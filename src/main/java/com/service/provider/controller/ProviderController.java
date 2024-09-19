@@ -36,7 +36,6 @@ import com.service.provider.service.ProviderService;
  * @author User
  */
 @RestController
-@CrossOrigin(origins = "*")
 public class ProviderController {
 
     @Autowired
@@ -111,6 +110,7 @@ public class ProviderController {
 
     @PutMapping("/{providerId}/update-profile")
     public ResponseEntity<String> updateProfile(@PathVariable long providerId, @ModelAttribute ProviderDto dto) {
+        System.out.println(dto);
         String provider = providerService.updateProviderProfile(providerId, dto);
         return ResponseEntity.ok(provider);
     }

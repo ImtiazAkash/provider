@@ -16,7 +16,6 @@ import com.service.provider.security_configaration.JwtTokenUtil;
 import com.service.provider.service.UserService;
 
 @RestController
-@CrossOrigin(origins = "*")
 public class UserController {
 
     @Autowired

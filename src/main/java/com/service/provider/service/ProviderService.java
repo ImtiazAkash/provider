@@ -28,11 +28,13 @@ public interface ProviderService {
 
     public String replaceProviderReviews(Long providerId, List<ReviewDto> newReviews);
 
-    public String replaceAwardsAndRecognition(long providerId, List<AwardDto> newAwards);
+
 
     public String replaceDocuments(long providerId, List<DocumentDto> newDocuments);
 
     public String updateProviderProfile(long providerId, ProviderDto profile);
 
     public ProviderResponse getAllProvider(int pageNumber, int pageSize, String sortBy, String sortDir);
+
+    public List<String> getLanguageByProviderId(long providerId);
 }

@@ -1,5 +1,6 @@
 package com.service.provider.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -52,8 +53,7 @@ public class ProviderServiceImpl implements ProviderService {
     private DocumentsRepository documentRepository;
     @Autowired
     private LanguageRepository languageRepository;
-    @Autowired
-    private AwardRepository awardRepository;
+    
 
 
 
@@ -149,6 +149,7 @@ public class ProviderServiceImpl implements ProviderService {
     }
 
     @Override
+    @Transactional
     public String addLanguagesToProvider(long providerId, Set<String> languageNames) {
         try {
             Provider provider = providerRepository.findById(providerId)
@@ -237,45 +238,7 @@ public class ProviderServiceImpl implements ProviderService {
         }
     }
 
-    @Override
-    public String replaceAwardsAndRecognition(long providerId, List<AwardDto> newAwards) {
-        try {
-
-            Provider provider = providerRepository.findById(providerId)
-                    .orElseThrow(() -> new Exception("Provider not found with id " + providerId));
-
-            // Delete all existing reviews
-            Set<Long> awardIdsToDelete = provider.getAwards().stream().map(Award::getAwardId)
-                    .collect(Collectors.toSet());
-
-            if (!awardIdsToDelete.isEmpty()) {
-                awardRepository.deleteAllById(awardIdsToDelete);
-            }
-
-            // Clear the existing reviews in memory
-            provider.getAwards().clear();
-
-            // Add new reviews
-            for (AwardDto newAward : newAwards) {
-                Award award = new Award();
-                award.setAwardTitle(newAward.getAwardTitle());
-                award.setAwardDescription(newAward.getAwardDescription());
-                award.setAwardYear(newAward.getAwardYear());
-
-                award.setProvider(provider);
-
-                provider.getAwards().add(award);
-            }
-
-            // Save the updated provider
-            providerRepository.save(provider);
-            return "Awards updated successfully";
-        } catch (Exception e) {
-
-            e.printStackTrace();
-            return "Updating awards failed";
-        }
-    }
+    
 
     @Override
     public String replaceDocuments(long providerId, List<DocumentDto> newDocuments) {
@@ -402,5 +365,19 @@ public class ProviderServiceImpl implements ProviderService {
 
         return modelMapper.map(provider, ProviderDto.class);
     }
+
+    @Override
+    public List<String> getLanguageByProviderId(long providerId) {
+        Optional<Provider> languageSet = this.providerRepository.findById(providerId);
+        List<String> languages=new ArrayList<>();
+        if(languageSet.isPresent()) {
+             languages = languageSet.get().getLanguages().stream().map(Language::getLanguage).collect(Collectors.toList());
+       
+        }
+        return languages;
+        
+    }
+
+    
 
 }

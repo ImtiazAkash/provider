@@ -20,6 +20,6 @@ public class FileController {
     @GetMapping("/images/{imageName}")
     @ResponseBody
     public Resource getImage(@PathVariable String imageName) {
-        return resourceLoader.getResource("classpath:static/assests/images/" + imageName);
+        return resourceLoader.getResource("file:C:/uploads/images/" + imageName);
     }
 }

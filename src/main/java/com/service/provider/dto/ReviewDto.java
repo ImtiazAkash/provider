@@ -17,7 +17,7 @@ private long reviewId;
     private String reviewCountry;
     private int rating;
     private MultipartFile reviewImage;
-
+    private String reviewImagePath;
     
     private ProviderDto provider;
 }

@@ -26,7 +26,7 @@ public interface ProviderService {
 
     public String addLanguagesToProvider(long providerId, Set<String>languageNames);
 
-    public String replaceProviderReviews(Long providerId, List<ReviewDto> newReviews);
+    
 
 
 

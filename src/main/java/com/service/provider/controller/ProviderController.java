@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.service.provider.dto.AwardDto;
 import com.service.provider.dto.ProviderDto;
 import com.service.provider.dto.ProviderResponse;
+import com.service.provider.dto.ReviewDto;
 import com.service.provider.model.AwardList;
 import com.service.provider.model.DocumentList;
 import com.service.provider.model.Provider;
@@ -86,15 +87,7 @@ public class ProviderController {
         return ResponseEntity.ok(provider);
     }
 
-    @PostMapping("/{providerId}/replace-reviews")
-    public ResponseEntity<String> replaceProviderReviews(
-            @PathVariable Long providerId,
-            @ModelAttribute ReviewList list) {
-        System.out.println(list);
-        String provider = providerService.replaceProviderReviews(providerId, list.getReviews());
-        return ResponseEntity.ok(provider);
-
-    }
+    
 
     
 

@@ -16,15 +16,15 @@ import com.service.provider.repository.ProviderRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class AwardServiceImpl implements AwardService{
+public class AwardServiceImpl implements AwardService {
 
     @Autowired
     private ProviderRepository providerRepository;
 
-
     @Autowired
     private AwardRepository awardRepository;
-@Override
+
+    @Override
     @Transactional
     public String replaceAwardsAndRecognition(long providerId, List<AwardDto> newAwards) {
         try {
@@ -64,8 +64,9 @@ public class AwardServiceImpl implements AwardService{
             return "Updating awards failed";
         }
     }
-@Override
-public List<Award> getAwardByProviderId(long providerId) {
-    return this.awardRepository.findAllByProviderProviderId(providerId);
-}
+
+    @Override
+    public List<Award> getAwardByProviderId(long providerId) {
+        return this.awardRepository.findAllByProviderProviderId(providerId);
+    }
 }
